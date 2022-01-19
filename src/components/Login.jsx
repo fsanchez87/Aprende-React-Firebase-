@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { auth } from "../firebaseconfig.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +20,24 @@ export const Login = () => {
         }
         if (e.code == "auth/weak-password") {
           setMserror("Password is invalid");
+        }
+      });
+  };
+
+  const LoginUsuario = (e) => {
+    e.preventDefault();
+    signInWithEmailAndPassword(auth, email, pass)
+      .then((r) => console.log(r))
+      .catch((e) => {
+        console.log(e.message);
+        if (e.code == "auth/invalid-email") {
+          setMserror("Email is invalid");
+        }
+        if (e.code == "auth/wrong-password") {
+          setMserror("Password is invalid");
+        }
+        if (e.code == "auth/user-not-found") {
+          setMserror("User is invalid");
         }
       });
   };
@@ -44,7 +65,16 @@ export const Login = () => {
             type="submit"
           />
         </form>
-        {mserror != null ? <div className="alert alert-danger mt-2 text-center p-0">{mserror}</div> : <span></span>}
+        <button className="btn btn-success w-100 mt-1" onClick={LoginUsuario}>
+          Iniciar sesión
+        </button>
+        {mserror != null ? (
+          <div className="alert alert-danger mt-2 text-center p-0">
+            {mserror}
+          </div>
+        ) : (
+          <span></span>
+        )}
       </div>
       <div className="col"></div>
     </div>
