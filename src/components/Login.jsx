@@ -5,15 +5,20 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [mserror, setMserror] = useState(null);
 
   const RegistrarUsuarios = (e) => {
     e.preventDefault();
-    try {
-      createUserWithEmailAndPassword(auth, email, pass);
-      alert("Usuario registrado");
-    } catch (error) {
-      console.log(error.message);
-    }
+    createUserWithEmailAndPassword(auth, email, pass)
+      .then((r) => alert("Usuario registrado"))
+      .catch((e) => {
+        if (e.code == "auth/invalid-email") {
+          setMserror("Email is invalid");
+        }
+        if (e.code == "auth/weak-password") {
+          setMserror("Password is invalid");
+        }
+      });
   };
 
   return (
@@ -23,7 +28,7 @@ export const Login = () => {
         <form className="form-group" onSubmit={RegistrarUsuarios}>
           <input
             className="form-control"
-            type="text"
+            type="email"
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
           ></input>
@@ -39,6 +44,7 @@ export const Login = () => {
             type="submit"
           />
         </form>
+        {mserror != null ? <div className="alert alert-danger mt-2 text-center p-0">{mserror}</div> : <span></span>}
       </div>
       <div className="col"></div>
     </div>
