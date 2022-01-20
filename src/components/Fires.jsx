@@ -1,18 +1,46 @@
-import React from "react";
+import { useState, useEffect } from "react";
 
 export const Fires = () => {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [user, setUser] = useState("");
+  const [error, setError] = useState(null);
+
+  const setUsuarios = (e) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError("Campo nombre vacio");
+    }
+    if (!phone.trim()) {
+      setError("Campo phone vacio");
+    }
+  };
+
   return (
     <div className="container mt-3">
       <div className="row">
         <div className="col">
           <h2>Formulario de Usuarios</h2>
-          <form className="form-group">
-            <input type="text" className="form-control" placeholder="Nombre"/>
-            <input type="text" className="form-control mt-3" placeholder="Nombre"/>
-            <input type="submit" value="Registrar" className="btn btn-secondary btn-lg w-100 mt-4"/>
+          <form className="form-group" onSubmit={setUsuarios}>
+            <input
+              onChange={(e) => setName(e.target.value)}
+              type="text"
+              className="form-control"
+              placeholder="Nombre"
+            />
+            <input
+              onChange={(e) => setPhone(e.target.value)}
+              type="text"
+              className="form-control mt-3"
+              placeholder="Phpne"
+            />
+            <input
+              type="submit"
+              value="Registrar"
+              className="btn btn-secondary btn-lg w-100 mt-4"
+            />
           </form>
-          
-          
+          {error ? <div>{error}</div> : <span></span>}
         </div>
         <div className="col">
           <h2>Lista de tu agenda</h2>
