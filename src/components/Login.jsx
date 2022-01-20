@@ -4,8 +4,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [mserror, setMserror] = useState(null);
@@ -13,7 +15,7 @@ export const Login = () => {
   const RegistrarUsuarios = (e) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, pass)
-      .then((r) => alert("Usuario registrado"))
+      .then((r) => navigate("/"))
       .catch((e) => {
         if (e.code == "auth/invalid-email") {
           setMserror("Email is invalid");
@@ -27,8 +29,8 @@ export const Login = () => {
   const LoginUsuario = (e) => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, pass)
-      .then((r) => console.log(r))
-      .catch((e) => {
+    .then((r) => navigate("/"))
+    .catch((e) => {
         console.log(e.message);
         if (e.code == "auth/invalid-email") {
           setMserror("Email is invalid");

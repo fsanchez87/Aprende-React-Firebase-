@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { auth } from "../firebaseconfig";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 export const Menu = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -18,11 +20,12 @@ export const Menu = () => {
   const CerrarSesion = () => {
     signOut(auth);
     setUser(null);
+    navigate("/");
   };
 
   return (
     <div>
-      <nav className="nav navbar-expand-lg navbar-dark bg-dark">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <ul className="navbar-nav mr-auto">
           <li className="nav-item">
             <Link className="nav-link" to="/">
@@ -30,21 +33,26 @@ export const Menu = () => {
             </Link>
           </li>
           <li>
-            <Link className="nav-link" to="/login">
-              Login
-            </Link>
+            {!user ? (
+              <Link className="nav-link" to="/login">
+                Login
+              </Link>
+            ) : (
+              <span></span>
+            )}
           </li>
           <li>
-            <Link className="nav-link" to="/admin">
-              Admin
-            </Link>
+            {!user ? (
+              <Link className="nav-link" to="/admin">
+                Admin
+              </Link>
+            ) : (
+              <span></span>
+            )}
           </li>
         </ul>
         {user ? (
-          <div
-            className="btn btn-danger "
-            onClick={CerrarSesion}
-          >
+          <div className="btn btn-danger align-item-end" onClick={CerrarSesion}>
             Logout
           </div>
         ) : (
