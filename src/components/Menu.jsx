@@ -50,6 +50,11 @@ export const Menu = () => {
               <span></span>
             )}
           </li>
+          <li className="nav-item">
+            <Link className="nav-link" to="/Fires">
+              Firestore
+            </Link>
+          </li>
         </ul>
         {user ? (
           <div className="btn btn-danger align-item-end" onClick={CerrarSesion}>
