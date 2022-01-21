@@ -7,6 +7,8 @@ import {
   orderBy,
   addDoc,
   getDocs,
+  deleteDoc,
+  doc,
 } from "firebase/firestore";
 
 export const Fires = () => {
@@ -45,13 +47,25 @@ export const Fires = () => {
         ...doc.data(),
       }));
       setAgenda(nuevoArray);
-      
-      console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error(e.message);
     }
     setName("");
     setPhone("");
+  };
+
+  const delUsuario = async (id) => {
+    try {
+      await deleteDoc(doc(db, "agenda", id));
+      const { docs } = await getDocs(collection(db, "agenda"));
+      const nuevoArray = docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAgenda(nuevoArray);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -89,14 +103,24 @@ export const Fires = () => {
             <span>No hay contactos</span>
           ) : (
             agenda.map((contacto) => (
-              <div className="card" className="width: 18rem;">
-                <ul className="list-group list-group-flush">
-                  <li className="list-group-item">
-                    {contacto.nombre} - {contacto.telefono}
-                  </li>
-                  <br />
-                </ul>
-              </div>
+              <ul className="list-group ">
+                <li
+                  className="list-group-item d-flex justify-content-between "
+                  key={contacto.id}
+                >
+                  {contacto.nombre} - {contacto.telefono}
+                  <button
+                    type="button"
+                    onClick={(id) => {
+                      delUsuario(contacto.id);
+                    }}
+                    className="btn btn-danger"
+                  >
+                    Borrar
+                  </button>
+                </li>
+                <br />
+              </ul>
             ))
           )}
         </div>
