@@ -3,17 +3,30 @@ import { db } from "../firebaseconfig";
 import {
   collection,
   query,
-  nSnapshot,
+  onSnapshot,
   orderBy,
   addDoc,
-  Timestamp,
+  getDocs,
 } from "firebase/firestore";
 
 export const Fires = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [user, setUser] = useState("");
+  const [agenda, setAgenda] = useState([]);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const getAgenda = async () => {
+      const { docs } = await getDocs(collection(db, "agenda"));
+      const nuevoArray = docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log(nuevoArray);
+      setAgenda(nuevoArray);
+    };
+    getAgenda();
+  }, []);
 
   const setUsuarios = async (e) => {
     e.preventDefault();
@@ -27,7 +40,7 @@ export const Fires = () => {
         nombre: name,
         telefono: phone,
       });
-      console.log("Documente written with ID: ", docRef.id);
+      console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error(e.message);
     }
@@ -65,6 +78,21 @@ export const Fires = () => {
         </div>
         <div className="col">
           <h2>Lista de tu agenda</h2>
+
+          {agenda.length === 0 ? (
+            <span>No hay contactos</span>
+          ) : (
+            agenda.map((contacto) => (
+              <div className="card" className="width: 18rem;">
+                <ul className="list-group list-group-flush">
+                  <li className="list-group-item">
+                    {contacto.nombre} - {contacto.telefono}
+                  </li>
+                  <br />
+                </ul>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
