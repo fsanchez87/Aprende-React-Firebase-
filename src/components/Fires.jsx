@@ -1,4 +1,13 @@
 import { useState, useEffect } from "react";
+import { db } from "../firebaseconfig";
+import {
+  collection,
+  query,
+  nSnapshot,
+  orderBy,
+  addDoc,
+  Timestamp,
+} from "firebase/firestore";
 
 export const Fires = () => {
   const [name, setName] = useState("");
@@ -6,14 +15,24 @@ export const Fires = () => {
   const [user, setUser] = useState("");
   const [error, setError] = useState(null);
 
-  const setUsuarios = (e) => {
+  const setUsuarios = async (e) => {
     e.preventDefault();
     if (!name.trim()) {
       setError("Campo nombre vacio");
-    }
-    if (!phone.trim()) {
+    } else if (!phone.trim()) {
       setError("Campo phone vacio");
     }
+    try {
+      const docRef = await addDoc(collection(db, "agenda"), {
+        nombre: name,
+        telefono: phone,
+      });
+      console.log("Documente written with ID: ", docRef.id);
+    } catch (e) {
+      console.error(e.message);
+    }
+    setName("");
+    setPhone("");
   };
 
   return (
@@ -27,12 +46,14 @@ export const Fires = () => {
               type="text"
               className="form-control"
               placeholder="Nombre"
+              value={name}
             />
             <input
               onChange={(e) => setPhone(e.target.value)}
               type="text"
               className="form-control mt-3"
-              placeholder="Phpne"
+              placeholder="Phone"
+              value={phone}
             />
             <input
               type="submit"

@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app"; // v9 compat packages are API
-import {getAuth, } from "firebase/auth";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAmgB5vrK9tYCPWmcfMu0otKGev6wTZfVU",
@@ -12,5 +13,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-export { auth };
+export { auth, db };
