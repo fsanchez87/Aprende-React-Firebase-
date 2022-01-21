@@ -22,7 +22,6 @@ export const Fires = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      console.log(nuevoArray);
       setAgenda(nuevoArray);
     };
     getAgenda();
@@ -40,6 +39,13 @@ export const Fires = () => {
         nombre: name,
         telefono: phone,
       });
+      const { docs } = await getDocs(collection(db, "agenda"));
+      const nuevoArray = docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAgenda(nuevoArray);
+      
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error(e.message);
