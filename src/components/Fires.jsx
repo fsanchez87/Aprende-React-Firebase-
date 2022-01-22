@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import { db } from "../firebaseconfig";
 import {
   collection,
-  query,
-  onSnapshot,
-  orderBy,
   addDoc,
   getDocs,
   deleteDoc,
   doc,
+  getDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 export const Fires = () => {
@@ -16,6 +15,8 @@ export const Fires = () => {
   const [phone, setPhone] = useState("");
   const [agenda, setAgenda] = useState([]);
   const [error, setError] = useState(null);
+  const [idUsuario, setIdUsuario] = useState("");
+  const [modoEdicion, setModoEdicion] = useState(null);
 
   useEffect(() => {
     const getAgenda = async () => {
@@ -54,6 +55,35 @@ export const Fires = () => {
     setPhone("");
   };
 
+  const setUpdate = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError("Campo nombre vacio");
+    } else if (!phone.trim()) {
+      setError("Campo phone vacio");
+    }
+    try {
+      const docToUpdate = doc(db, "agenda", idUsuario);
+      await updateDoc(docToUpdate, {
+        telefono: phone,
+        nombre: name,
+      });
+      const { docs } = await getDocs(collection(db, "agenda"));
+      const nuevoArray = docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAgenda(nuevoArray);
+    } catch (error) {
+      console.log(error.message);
+    }
+
+    setName('')
+    setPhone('')
+    setIdUsuario('')
+    modoEdicion(false)
+  };
+
   const delUsuario = async (id) => {
     try {
       await deleteDoc(doc(db, "agenda", id));
@@ -68,12 +98,30 @@ export const Fires = () => {
     }
   };
 
+  const modoActulizar = async (id) => {
+    try {
+      const docs = await getDoc(doc(db, "agenda", id));
+      console.log(docs.data());
+      const { nombre, telefono } = docs.data();
+      setName(nombre);
+      setPhone(telefono);
+      setIdUsuario(id);
+      setModoEdicion(true);
+      console.log(id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="container mt-3">
       <div className="row">
         <div className="col">
           <h2>Formulario de Usuarios</h2>
-          <form className="form-group" onSubmit={setUsuarios}>
+          <form
+            className="form-group"
+            onSubmit={modoEdicion ? setUpdate : setUsuarios}
+          >
             <input
               onChange={(e) => setName(e.target.value)}
               type="text"
@@ -88,11 +136,19 @@ export const Fires = () => {
               placeholder="Phone"
               value={phone}
             />
-            <input
-              type="submit"
-              value="Registrar"
-              className="btn btn-secondary btn-lg w-100 mt-4"
-            />
+            {modoEdicion ? (
+              <input
+                type="submit"
+                value="Actualizar"
+                className="btn btn-secondary btn-lg w-100 mt-4"
+              />
+            ) : (
+              <input
+                type="submit"
+                value="Registrar"
+                className="btn btn-secondary btn-lg w-100 mt-4"
+              />
+            )}
           </form>
           {error ? <div>{error}</div> : <span></span>}
         </div>
@@ -103,22 +159,34 @@ export const Fires = () => {
             <span>No hay contactos</span>
           ) : (
             agenda.map((contacto) => (
-              <ul className="list-group ">
+              <ul className="list-group">
                 <li
-                  className="list-group-item d-flex justify-content-between "
+                  className="list-group-item d-flex justify-content-between align-items-center"
                   key={contacto.id}
                 >
                   {contacto.nombre} - {contacto.telefono}
-                  <button
-                    type="button"
-                    onClick={(id) => {
-                      delUsuario(contacto.id);
-                    }}
-                    className="btn btn-danger"
-                  >
-                    Borrar
-                  </button>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={(id) => {
+                        modoActulizar(contacto.id);
+                      }}
+                      className="btn btn-warning mx-2 "
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(id) => {
+                        delUsuario(contacto.id);
+                      }}
+                      className="btn btn-danger"
+                    >
+                      Borrar
+                    </button>
+                  </div>
                 </li>
+
                 <br />
               </ul>
             ))
